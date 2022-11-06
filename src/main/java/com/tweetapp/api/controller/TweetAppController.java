@@ -90,13 +90,13 @@ public class TweetAppController {
 				// // authCookie.setDomain(".amazonaws.com");
 				// authCookie.setSecure(false);
 				// response.addCookie(authCookie);
-				ResponseCookie cookie = ResponseCookie.from("authCookie", authUser.getToken())
-												.sameSite("None")
-												.path("/")
-												.secure(true)
-												.domain(request.getHeader(HttpHeaders.HOST).split(":")[0])
-												.build();
-				response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+				// ResponseCookie cookie = ResponseCookie.from("authCookie", authUser.getToken())
+				// 								.sameSite("None")
+				// 								.path("/")
+				// 								.secure(true)
+				// 								.domain(request.getHeader(HttpHeaders.HOST).split(":")[0])
+				// 								.build();
+				// response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 				return new ResponseEntity<UserResponse>(authUser, HttpStatus.OK);
 			} else {
 				response.addCookie(new Cookie("authCookie", null)); // on unsucessfull login remove auth Cookie

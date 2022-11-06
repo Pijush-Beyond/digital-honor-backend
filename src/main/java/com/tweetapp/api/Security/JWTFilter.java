@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.util.StringUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -51,15 +52,15 @@ public class JWTFilter extends GenericFilterBean {
 		response.setHeader("Access-Control-Allow-Headers", request.getHeader("Access-Control-Request-Headers"));
 		response.setHeader("Access-Control-Max-Age", "86400");
 		response.setHeader("Access-Control-Allow-Credentials", "true");
-		// String token = request.getHeader("Authorization");
-		List<String> token = new ArrayList<String>();
-		if(request.getCookies()!=null)
-			token = Arrays.asList(request.getCookies()).stream().filter(cookie-> cookie.getName().equals("authCookie")).map(cookie-> cookie.getValue()).toList();
+		String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+		// List<String> token = new ArrayList<String>();
+		// if(request.getCookies()!=null)
+		// 	token = Arrays.asList(request.getCookies()).stream().filter(cookie-> cookie.getName().equals("authCookie")).map(cookie-> cookie.getValue()).toList();
 
-//		if (!StringUtils.isEmpty(token)) {
-//			String[] tokens = token.split(" ");
-//			token = tokens[1];
-//		}
+		if (!StringUtils.isEmpty(token)) {
+			String[] tokens = token.split(" ");
+			token = tokens[1];
+		}
 
 		if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
 			response.sendError(HttpServletResponse.SC_OK, "success");
@@ -70,23 +71,23 @@ public class JWTFilter extends GenericFilterBean {
 			response.setStatus(HttpServletResponse.SC_OK);
 			filterChain.doFilter(req, res);
 		} else {
-			// if (token == null || !tokenService.isTokenValid(token)) {
-			// 	response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-			// } else {
-			// 	ObjectId userId = new ObjectId(tokenService.getUserIdFromToken(token));
-			// 	request.setAttribute("userId", userId);
-			// 	filterChain.doFilter(req, res);
-
-			// }
-
-			if (token.size()==0 || !tokenService.isTokenValid(token.get(0))) {
+			if (token == null || !tokenService.isTokenValid(token)) {
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 			} else {
-				ObjectId userId = new ObjectId(tokenService.getUserIdFromToken(token.get(0)));
+				ObjectId userId = new ObjectId(tokenService.getUserIdFromToken(token));
 				request.setAttribute("userId", userId);
 				filterChain.doFilter(req, res);
 
 			}
+
+			// if (token.size()==0 || !tokenService.isTokenValid(token.get(0))) {
+			// 	response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+			// } else {
+			// 	ObjectId userId = new ObjectId(tokenService.getUserIdFromToken(token.get(0)));
+			// 	request.setAttribute("userId", userId);
+			// 	filterChain.doFilter(req, res);
+
+			// }
 		}
 
 	}
